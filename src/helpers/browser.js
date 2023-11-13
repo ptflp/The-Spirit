@@ -91,4 +91,4 @@ function _getPropFromIndex(prop, index, testCase) {
     return prop;
 }
 
-init();
+// init();

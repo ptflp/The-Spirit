@@ -2,7 +2,7 @@ var parse = require('mout/queryString/parse');
 var keys = require('mout/object/keys');
 var query = exports.query = parse(window.location.href.replace('#','?'));
 
-exports.useStats = false;
+exports.useStats = true;
 exports.isMobile = /(iPad|iPhone|Android)/i.test(navigator.userAgent);
 
 var amountMap = {
@@ -10,7 +10,7 @@ var amountMap = {
     '8k' : [128, 64, 0.42],
     '16k' : [128, 128, 0.48],
     '32k' : [256, 128, 0.55],
-    '65k' : [256, 256, 0.6],
+    '65k' : [128, 128, 2.5],
     '131k' : [512, 256, 0.85],
     '252k' : [512, 512, 1.2],
     '524k' : [1024, 512, 1.4],
@@ -26,16 +26,16 @@ exports.simulatorTextureWidth = amountInfo[0];
 exports.simulatorTextureHeight = amountInfo[1];
 
 exports.useTriangleParticles = true;
-exports.followMouse = true;
+exports.followMouse = false;
 
-exports.speed = 1;
+exports.speed = .1;
 exports.dieSpeed = 0.015;
 exports.radius = amountInfo[2];
-exports.curlSize = 0.02;
+exports.curlSize = 0.015;
 exports.attraction = 1;
 exports.shadowDarkness = 0.45;
 
-exports.bgColor = '#343434';
+exports.bgColor = '#6e8a96';
 exports.color1 = '#ffffff';
 exports.color2 = '#ffffff';
 

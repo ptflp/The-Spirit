@@ -1,7 +1,15 @@
+var RecordButton = require('./recordButton');
+var Microphone = require('./mic');
 var settings = require('../core/settings');
+if (window.settings === undefined) {
+    window.settings = settings;
+}
 var THREE = require('three');
 
 var undef;
+
+var recordButton;
+var mic;
 
 var glslify = require('glslify');
 var shaderParse = require('../helpers/shaderParse');
@@ -31,7 +39,6 @@ exports.positionRenderTarget = undef;
 exports.prevPositionRenderTarget = undef;
 
 function init(renderer) {
-
     _renderer = renderer;
     _followPoint = new THREE.Vector3();
 
@@ -46,6 +53,12 @@ function init(renderer) {
         alert( 'No OES_texture_float support for float textures!' );
         return;
     }
+    
+    mic = new Microphone();
+    if (window.mic === undefined) {
+        window.mic = mic;
+    }
+    recordButton = new RecordButton({mic: mic});
 
     _scene = new THREE.Scene();
     _camera = new THREE.Camera();
@@ -147,14 +160,49 @@ function _createPositionTexture() {
     return texture;
 }
 
-function update(dt) {
+function RandomColor () {
+    let color = '#';
+    for (let i = 0; i < 6; i++){
+        color += Math.floor(Math.random() * 16).toString(16);
+    }
+    return color;
+}
 
+setInterval(function() {
+    settings.color1 = RandomColor();
+    settings.color2 = RandomColor();
+}, 1000);
+
+function update(dt) {
     if(settings.speed || settings.dieSpeed) {
         var r = 200;
         var h = 60;
         if(settings.isMobile) {
             r = 100;
             h = 40;
+        }
+        
+        // if (window.player && window.player.playState === "running") {
+        //     let volume = window.player.
+        //     if (volume > 2.5) {
+        //         volume = 2.5
+        //     }
+        //     settings.speed = volume;
+        // }
+        
+        if (mic.record) {
+            window.speechSynthesis = undefined;
+            let volume = mic.getVolume() * 50;
+            if (volume > 2.5) {
+                volume = 2.5
+            }
+            if (volume < 0) {
+                volume = 0.1
+            }
+            if (isNaN(volume)) {
+                volume = 0.1
+            }
+            settings.speed = volume;
         }
 
         var autoClearColor = _renderer.autoClearColor;
@@ -181,7 +229,7 @@ function update(dt) {
                 Math.cos(_followPointTime * 4.0) * h,
                 Math.sin(_followPointTime * 2.0) * r
             );
-            _positionShader.uniforms.mouse3d.value.lerp(_followPoint, 0.2);
+            _positionShader.uniforms.mouse3d.value.lerp(_followPoint, 0);
         }
 
         // _renderer.setClearColor(0, 0);
@@ -195,5 +243,3 @@ function update(dt) {
     }
 
 }
-
-

@@ -2,6 +2,8 @@ var dat = require('dat-gui');
 var Stats = require('stats.js');
 var css = require('dom-css');
 var raf = require('raf');
+var StartTest = require('./speech/totext');
+var Say = require('./speech/totext');
 
 var THREE = require('three');
 
@@ -10,7 +12,6 @@ var settings = require('./core/settings');
 
 var math = require('./utils/math');
 var ease = require('./utils/ease');
-var mobile = require('./fallback/mobile');
 var encode = require('mout/queryString/encode');
 
 var postprocessing = require('./3d/postprocessing/postprocessing');
@@ -22,7 +23,6 @@ var simulator = require('./3d/simulator');
 var particles = require('./3d/particles');
 var lights = require('./3d/lights');
 var floor = require('./3d/floor');
-
 
 var undef;
 var _gui;
@@ -288,4 +288,5 @@ function _render(dt, newTime) {
 
 }
 
-mobile.pass(init);
+// mobile.pass(init);
+init();

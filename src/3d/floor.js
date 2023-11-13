@@ -19,8 +19,4 @@ function init() {
 
     floor.rotation.x = -1.57;
     floor.receiveShadow = true;
-
-
-
-
 }

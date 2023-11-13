@@ -60,7 +60,7 @@ function init(sampleCount) {
 
     var gl = effectComposer.renderer.getContext();
     if(!gl.getExtension('OES_texture_float') || !gl.getExtension('OES_texture_float_linear')) {
-        alert('no float linear support');
+        // alert('no float linear support');
     }
 
     _motionRenderTarget = fboHelper.createRenderTarget(1, 1, THREE.RGBAFormat, THREE.FloatType);

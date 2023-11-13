@@ -13,7 +13,7 @@ var _shadowDarkness = 0.45;
 function init() {
 
     mesh = exports.mesh = new THREE.Object3D();
-    mesh.position.set(0, 500, 0);
+    mesh.position.set(0, 200, 0);
 
     var ambient = new THREE.AmbientLight( 0x333333 );
     mesh.add( ambient );

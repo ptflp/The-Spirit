@@ -2,47 +2,113 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>The Spirit</title>
+        <title>AI Assistant</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 
-        <meta property="og:title" content="The Spirit" />
-        <meta property="og:description" content="The Spirit is a personal experiment by Edan Kwan." />
-        <meta property="og:image:type" content="image/jpeg" />
+        <meta property="og:title" content="AI Assistant" />
+        <meta property="og:description" content="AI Assistant is a personal experiment by ptflp." />
         <meta property="og:image:width" content="800" />
         <meta property="og:image:height" content="480" />
-        <meta property="og:image" content="http://www.edankwan.com/experiments/the-spirit/images/share.jpg" />
-
-        <meta name="twitter:card" content="summary">
-        <meta name="twitter:site" content="@edankwan">
-        <meta name="twitter:url" content="http://www.edankwan.com/experiments/the-spirit">
-        <meta name="twitter:title" content="The Spirit">
-        <meta name="twitter:description" content="The Spirit is a personal experiment by Edan Kwan.">
-        <meta name="twitter:image" content="http://www.edankwan.com/experiments/the-spirit/images/share.jpg">
 
         <link href='https://fonts.googleapis.com/css?family=Oxygen:400,700' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href="css/normalize.css">
         <link rel="stylesheet" href="css/index.css">
     </head>
     <body>
-        <div class="mobile">
-            <p>Sorry, this experiment is not designed for mobile devices. But if you think your device can handle it, you can keep forward to access the experiment <span class="mobile-bypass">here</span>.</p>
-            <p>Or you check out the <a href="https://www.youtube.com/watch?v=lcHAtTGzQE8" target="_blank">video capture</a> of this experiment instead. The source code is also accessible at <a href="https://github.com/edankwan/The-Spirit" target="_blank">Github</a>.</p>
-            <p>Sorry for any inconvenience caused.</p>
-            <p>Cheers,</p>
-            <p><a href="http://www.edankwan.com/" target="_blank">Edan Kwan</a></p>
-        </div>
         <div class="logo"></div>
-        <div class="instruction">Press space key to toggle movement</div>
+        <div class="instruction"></div>
         <div class="footer">
-            <span><a href="http://www.edankwan.com/" target="_blank">Edan Kwan</a></span>
-            <span>|</span>
-            <span><a href="https://github.com/edankwan/The-Spirit" target="_blank">Github</a></span>
-            <span>|</span>
-            <span><a href="https://www.youtube.com/watch?v=lcHAtTGzQE8" target="_blank">Youtube</a></span>
+            <span id="test_say">Say something</span>
         </div>
+
         <script src="js/three.r74.min.js"></script>
+        <!-- Speech SDK reference sdk. -->
+        <script src="https://aka.ms/csspeech/jsbrowserpackageraw"></script>
+        <script type="text/javascript" >
+            // subscription key and region for speech services.
+            var SpeechSDK;
+            var synthesizer;
+            var player;
+        </script>
         <script src="js/index.js"></script>
+        <script type="text/javascript">
+            const audioContext = new AudioContext();
+            const audioSource = audioContext.createMediaStreamSource(stream);
+            if (!!window.SpeechSDK) {
+                SpeechSDK = window.SpeechSDK;
+
+                // in case we have a function for getting an authorization token, call it.
+                if (typeof RequestAuthorizationToken === "function") {
+                    RequestAuthorizationToken();
+                }
+            }
+            
+            function getRandomArbitrary(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            function Say(text) {
+                var speechConfig = SpeechSDK.SpeechConfig.fromSubscription('2723ecee3597484c962a74c70cf280dc', 'eastus');
+                speechConfig.speechSynthesisVoiceName = "en-US-JennyMultilingualV2Neural";
+                // Создание PushAudioOutputStream с пользовательским обратным вызовом
+                player = new SpeechSDK.SpeakerAudioDestination();
+                var audioConfig  = SpeechSDK.AudioConfig.fromSpeakerOutput(player);
+                synthesizer = new SpeechSDK.SpeechSynthesizer(speechConfig, audioConfig);
+                window.synthesizer = synthesizer;
+
+                synthesizer.speakTextAsync(
+                    text,
+                    function (result) {
+                        settings.speed = getRandomArbitrary(0.3, 1.5);
+                        let intervalId = setInterval(function () {
+                            settings.speed = getRandomArbitrary(0.8, 2.5);
+                            settings.dieSpeed = 0.002
+                        }, 200);
+                        // Функция для остановки интервала
+                        function stopInterval() {
+                            clearInterval(intervalId);
+                            settings.speed = 0.1;
+                            settings.dieSpeed = 0.02;
+                            console.log("Интервал остановлен");
+                        }
+
+                        // Пример использования: остановка интервала через 5 секунд
+                        const timeout = result.privAudioDuration/10000 - 300;
+                        console.log(timeout)
+                        setTimeout(function() {stopInterval()}, timeout);
+                        
+                        if (result.reason === SpeechSDK.ResultReason.SynthesizingAudioCompleted) {
+
+                            
+                        } else if (result.reason === SpeechSDK.ResultReason.Canceled) {
+                            console.log("canceled")
+                        }
+                        window.console.log(result);
+                        synthesizer.close();
+                    },
+                    function (err) {
+                        window.console.log(err);
+                        synthesizer.close();
+                    });
+            }
+            
+            const test_say = document.getElementById('test_say');
+            test_say.onclick = function () {
+                Say('"مرحبًا, أنا متعدد اللغات ويمكنني التحدث بلغات عديدة."\n' +
+                    '"Hola, puedo hablar muchos idiomas."\n' +
+                    '"Hello, I am fluent in multiple languages."\n' +
+                    '"Bonjour, je parle plusieurs langues couramment."\n' +
+                    'Привет, я свободно владею несколькими языками."\n' +
+                    ' "你好，我会说多种语言。"\n' +
+                    '"こんにちは、私は多くの言語を話すことができます。"\n' +
+                    '"Hallo, ich kann viele Sprachen sprechen."')
+            }
+
+            document.addEventListener("DOMContentLoaded", function () {
+                setTimeout(function() {console.log('ready')}, 4000);
+            });
+        </script>
     </body>
 </html>
